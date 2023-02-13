@@ -40,7 +40,7 @@
 #include "router_globals.h"
 
 // On board LED
-#define BLINK_GPIO 2
+#define BLINK_GPIO 12
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t wifi_event_group;
