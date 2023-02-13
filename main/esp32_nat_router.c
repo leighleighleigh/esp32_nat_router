@@ -555,11 +555,11 @@ void app_main(void)
 
     get_portmap_tab();
 
-    // Setup WIFI
-    wifi_init(ssid, ent_username, ent_identity, passwd, static_ip, subnet_mask, gateway_addr, ap_ssid, ap_passwd, ap_ip);
-
     pthread_t t1;
     pthread_create(&t1, NULL, led_status_thread, NULL);
+
+    // Setup WIFI
+    wifi_init(ssid, ent_username, ent_identity, passwd, static_ip, subnet_mask, gateway_addr, ap_ssid, ap_passwd, ap_ip);
 
     ip_napt_enable(my_ap_ip, 1);
     ESP_LOGI(TAG, "NAT is enabled");
@@ -619,8 +619,7 @@ void app_main(void)
     /* Main loop */
     while(true) {
         // If we have been alive for longer than 1 hour, reboot!
-        // For now we test with 1 minute
-        if (xTaskGetTickCount() > 60000) {
+        if (xTaskGetTickCount() > 3600000) {
             esp_restart();
         }
         /* Get a line using linenoise.
