@@ -619,8 +619,8 @@ void app_main(void)
     /* Main loop */
     while(true) {
         // If we have been alive for longer than 1 hour, reboot!
-        // For now we test with 5 minutes
-        if (xTaskGetTickCount() > 60) {
+        // For now we test with 1 minute
+        if (xTaskGetTickCount() > 60000) {
             esp_restart();
         }
         /* Get a line using linenoise.
