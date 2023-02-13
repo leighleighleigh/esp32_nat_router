@@ -361,7 +361,7 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
 }
 
 const int CONNECTED_BIT = BIT0;
-#define JOIN_TIMEOUT_MS (2000)
+#define JOIN_TIMEOUT_MS (60000)
 
 void wifi_init(const char* ssid, const char* ent_username, const char* ent_identity, const char* passwd, const char* static_ip, const char* subnet_mask, const char* gateway_addr, const char* ap_ssid, const char* ap_passwd, const char* ap_ip)
 {
@@ -618,6 +618,11 @@ void app_main(void)
 
     /* Main loop */
     while(true) {
+        // If we have been alive for longer than 1 hour, reboot!
+        // For now we test with 5 minutes
+        if (xTaskGetTickCount() > 60) {
+            esp_restart();
+        }
         /* Get a line using linenoise.
          * The line is returned when ENTER is pressed.
          */
