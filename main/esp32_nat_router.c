@@ -339,13 +339,13 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         my_ip = event->ip_info.ip.addr;
         delete_portmap_tab();
         apply_portmap_tab();
-        if (esp_netif_get_dns_info(wifiSTA, ESP_NETIF_DNS_MAIN, &dns) == ESP_OK)
-        {
-            dnsserver.type = IPADDR_TYPE_V4;
-            dnsserver.u_addr.ip4.addr = dns.ip.u_addr.ip4.addr;
-            dhcps_dns_setserver(&dnsserver);
-            ESP_LOGI(TAG, "set dns to:" IPSTR, IP2STR(&(dnsserver.u_addr.ip4)));
-        }
+        // if (esp_netif_get_dns_info(wifiSTA, ESP_NETIF_DNS_MAIN, &dns) == ESP_OK)
+        // {
+            // dnsserver.type = IPADDR_TYPE_V4;
+            // dnsserver.u_addr.ip4.addr = dns.ip.u_addr.ip4.addr;
+            // dhcps_dns_setserver(&dnsserver);
+            // ESP_LOGI(TAG, "set dns to:" IPSTR, IP2STR(&(dnsserver.u_addr.ip4)));
+        // }
         xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_BIT);
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED)
@@ -465,12 +465,12 @@ void wifi_init(const char* ssid, const char* ent_username, const char* ent_ident
     dhcps_set_option_info(6, &dhcps_dns_value, sizeof(dhcps_dns_value));
 
     // Set custom dns server address for dhcp server
-    dnsserver.u_addr.ip4.addr = ipaddr_addr(DEFAULT_DNS);;
+    dnsserver.u_addr.ip4.addr = ipaddr_addr(DEFAULT_DNS);
     dnsserver.type = IPADDR_TYPE_V4;
     dhcps_dns_setserver(&dnsserver);
 
-//    tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_AP, TCPIP_ADAPTER_DNS_MAIN, &dnsinfo);
-//    ESP_LOGI(TAG, "DNS IP:" IPSTR, IP2STR(&dnsinfo.ip.u_addr.ip4));
+    // tcpip_adapter_get_dns_info(TCPIP_ADAPTER_IF_AP, TCPIP_ADAPTER_DNS_MAIN, &dnsinfo);
+    // ESP_LOGI(TAG, "DNS IP:" IPSTR, IP2STR(&dnsinfo.ip.u_addr.ip4));
 
     xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,
         pdFALSE, pdTRUE, JOIN_TIMEOUT_MS / portTICK_PERIOD_MS);
@@ -616,12 +616,28 @@ void app_main(void)
 #endif //CONFIG_LOG_COLORS
     }
 
+    unsigned int runTimePing = xTaskGetTickCount() * portTICK_PERIOD_MS;
+
     /* Main loop */
     while(true) {
         // If we have been alive for longer than 1 hour, reboot!
-        if (xTaskGetTickCount() > 3600000) {
+        unsigned int runTimeMillis = xTaskGetTickCount() * portTICK_PERIOD_MS;
+        // unsigned int restartTimer = 60*60*1000;
+        unsigned int restartTimer = 60*1000*30; // 30 minute restart timer
+
+        // if (runTimeMillis - runTimePing > 1000)
+        // {
+        //     runTimePing = runTimeMillis;
+        //     printf("PING! %d\n",runTimePing);
+        // }
+        if (runTimeMillis > restartTimer) {
+            printf("\n RESTARTING");
+            printf("\n RESTARTING");
+            printf("\n RESTARTING");
+            vTaskDelay(1000/portTICK_PERIOD_MS);
             esp_restart();
         }
+
         /* Get a line using linenoise.
          * The line is returned when ENTER is pressed.
          */
